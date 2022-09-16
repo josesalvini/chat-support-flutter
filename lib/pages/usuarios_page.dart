@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:chat_support/models/usuario.dart';
+import 'package:chat_support/services/auth_service.dart';
 
 class UsuariosPage extends StatefulWidget {
   const UsuariosPage({super.key});
@@ -14,20 +16,29 @@ class _UsuariosPageState extends State<UsuariosPage> {
       RefreshController(initialRefresh: false);
 
   final usuarios = [
-    Usuario(onLine: true, email: 'jose@gmail.com', nombre: 'José', uid: '1'),
-    Usuario(onLine: false, email: 'juan@gmail.com', nombre: 'Juan', uid: '2'),
-    Usuario(onLine: true, email: 'pedro@gmail.com', nombre: 'Pedro', uid: '3')
+    Usuario(online: true, email: 'jose@gmail.com', nombre: 'José', uid: '1'),
+    Usuario(online: false, email: 'juan@gmail.com', nombre: 'Juan', uid: '2'),
+    Usuario(online: true, email: 'pedro@gmail.com', nombre: 'Pedro', uid: '3')
   ];
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+    final usuario = authService.usuario;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Usuario', style: TextStyle(color: Colors.black54)),
+        title: Text(usuario.nombre, style: const TextStyle(color: Colors.black54)),
         elevation: 1,
         backgroundColor: Colors.white,
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () async {
+            final result = await AuthService.deleteToken();
+            if (!mounted) return;
+            if (result) {
+              Navigator.pushReplacementNamed(context, 'login');
+            }
+          },
           icon: const Icon(Icons.exit_to_app, color: Colors.black54),
         ),
         actions: <Widget>[
@@ -80,7 +91,7 @@ class _UsuariosPageState extends State<UsuariosPage> {
         width: 10,
         height: 10,
         decoration: BoxDecoration(
-          color: usuario.onLine ? Colors.green[400] : Colors.red[400],
+          color: usuario.online ? Colors.green[400] : Colors.red[400],
           borderRadius: BorderRadius.circular(100.0),
         ),
       ),

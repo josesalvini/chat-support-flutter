@@ -1,12 +1,15 @@
-import 'package:chat_support/widgets/custom_terminos.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'package:chat_support/widgets/custom_button.dart';
 import 'package:chat_support/widgets/custom_input.dart';
 import 'package:chat_support/widgets/custom_label_footer.dart';
 import 'package:chat_support/widgets/custom_label_header.dart';
 import 'package:chat_support/widgets/custom_logo.dart';
-import 'dart:developer';
+import 'package:chat_support/helpers/alert_dialog.dart';
+import 'package:chat_support/services/auth_service.dart';
+import 'package:chat_support/widgets/custom_terminos.dart';
+
 
 class RegisterPage extends StatelessWidget {
   const RegisterPage({super.key});
@@ -72,6 +75,8 @@ class _FormRegisterState extends State<_FormRegister> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 5, bottom: 20),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -97,11 +102,25 @@ class _FormRegisterState extends State<_FormRegister> {
           ),
           CustomButton(
             text: 'Register',
-            onPressed: () {
-              log(usernameController.text);
-              log(emailController.text);
-              log(passwordController.text);
-            },
+            onPressed: authService.registrando
+                ? null
+                : () async {
+                    //Quita el foco, y oculta el teclado
+                    FocusScope.of(context).unfocus();
+                    final result = await authService.register(
+                        usernameController.text.trim(),
+                        emailController.text.trim(),
+                        passwordController.text.trim());
+                    if (!mounted) return;
+
+                    if (result == true) {
+                      //Navegar a la pagina principal
+                      Navigator.pushReplacementNamed(context, 'login');
+                    } else {
+                      //Mostar error en una alerta
+                      showAlert(context, 'Register', result);
+                    }
+                  },
           ),
         ],
       ),

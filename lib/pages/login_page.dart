@@ -1,11 +1,13 @@
-import 'package:chat_support/widgets/custom_button.dart';
+import 'package:chat_support/helpers/alert_dialog.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:chat_support/widgets/custom_input.dart';
 import 'package:chat_support/widgets/custom_label_footer.dart';
 import 'package:chat_support/widgets/custom_label_header.dart';
 import 'package:chat_support/widgets/custom_logo.dart';
 import 'package:chat_support/widgets/custom_terminos.dart';
-import 'dart:developer';
+import 'package:chat_support/services/auth_service.dart';
+import 'package:chat_support/widgets/custom_button.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -68,6 +70,8 @@ class __FormLoginState extends State<_FormLogin> {
 
   @override
   Widget build(BuildContext context) {
+    final authService = Provider.of<AuthService>(context);
+
     return Container(
       margin: const EdgeInsets.only(top: 5),
       padding: const EdgeInsets.symmetric(horizontal: 50),
@@ -87,10 +91,24 @@ class __FormLoginState extends State<_FormLogin> {
           ),
           CustomButton(
             text: 'Login',
-            onPressed: () {
-              log(emailController.text);
-              log(passwordController.text);
-            },
+            onPressed: authService.autenticando
+                ? null
+                : () async {
+                    //Quita el foco, y oculta el teclado
+                    FocusScope.of(context).unfocus();
+                    final result = await authService.login(
+                        emailController.text.trim(),
+                        passwordController.text.trim());
+                    if (!mounted) return;
+
+                    if (result == true) {
+                      //Navegar a la pagina principal
+                      Navigator.pushReplacementNamed(context, 'usuarios');
+                    } else {
+                      //Mostar error en una alerta
+                      showAlert(context, 'Login', result);
+                    }
+                  },
           ),
         ],
       ),
