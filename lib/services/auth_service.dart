@@ -1,7 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'dart:developer';
 //import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:chat_support/global/environment.dart';
@@ -72,11 +73,11 @@ class AuthService with ChangeNotifier {
         await saveToken(loginResponse.token);
         return true;
       } catch (e) {
-        log(e.toString());
+        //log(e.toString());
         return e.toString();
       }
     } else {
-      log(response.body);
+      //log(response.body);
       final respError = jsonDecode(response.body);
       return respError['msg'];
     }
@@ -108,11 +109,11 @@ class AuthService with ChangeNotifier {
         await saveToken(loginResponse.token);
         return true;
       } catch (e) {
-        log(e.toString());
+        //log(e.toString());
         return e.toString();
       }
     } else {
-      log(response.body);
+      //log(response.body);
       final respError = jsonDecode(response.body);
       return respError['msg'];
     }
@@ -125,7 +126,7 @@ class AuthService with ChangeNotifier {
         .setString('token', token)
         .then((value) => true)
         .catchError((err) {
-      log('Error: $err');
+      //log('Error: $err');
     });
   }
 
@@ -134,7 +135,7 @@ class AuthService with ChangeNotifier {
     //final success = await prefs.remove('counter');
     final SharedPreferences prefs = await _prefs;
     return await prefs.remove('token').then((value) => true).catchError((err) {
-      log('Error: $err');
+      //log('Error: $err');
     });
   }
 
@@ -153,19 +154,20 @@ class AuthService with ChangeNotifier {
         'x-token': token,
       },
     );
+
     if (response.statusCode == 200) {
       final loginResponse = loginResponseFromJson(response.body);
       usuario = loginResponse.usuario;
       try {
         await saveToken(loginResponse.token);
-        log('Token nuevo: ${loginResponse.token}');
+        //log('Token nuevo: ${loginResponse.token}');
         return true;
       } catch (e) {
-        log(e.toString());
+        //log(e.toString());
         return false;
       }
     } else {
-      log(response.body);
+      //log(response.body);
       return false;
     }
   }
@@ -184,7 +186,6 @@ class AuthService with ChangeNotifier {
     await _storage.delete(key: 'token');
   }
 
-  
     static Future<String?> getToken() async {
     const storage = FlutterSecureStorage();
     // Obtener el token almacenado

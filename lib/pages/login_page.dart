@@ -1,4 +1,4 @@
-import 'package:chat_support/helpers/alert_dialog.dart';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:chat_support/widgets/custom_input.dart';
@@ -8,6 +8,8 @@ import 'package:chat_support/widgets/custom_logo.dart';
 import 'package:chat_support/widgets/custom_terminos.dart';
 import 'package:chat_support/services/auth_service.dart';
 import 'package:chat_support/widgets/custom_button.dart';
+import 'package:chat_support/helpers/alert_dialog.dart';
+import 'package:chat_support/services/socket_service.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -71,6 +73,7 @@ class __FormLoginState extends State<_FormLogin> {
   @override
   Widget build(BuildContext context) {
     final authService = Provider.of<AuthService>(context);
+    final socketService = Provider.of<SocketService>(context);
 
     return Container(
       margin: const EdgeInsets.only(top: 5),
@@ -102,6 +105,7 @@ class __FormLoginState extends State<_FormLogin> {
                     if (!mounted) return;
 
                     if (result == true) {
+                      socketService.connect();
                       //Navegar a la pagina principal
                       Navigator.pushReplacementNamed(context, 'usuarios');
                     } else {

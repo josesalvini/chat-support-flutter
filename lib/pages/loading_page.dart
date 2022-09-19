@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:chat_support/pages/login_page.dart';
 import 'package:chat_support/pages/usuarios_page.dart';
 import 'package:chat_support/services/auth_service.dart';
+import 'package:chat_support/services/socket_service.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({super.key});
@@ -26,15 +27,18 @@ class _LoadingPageState extends State<LoadingPage> {
       ),
     );
   }
+
   //Opcion para un widget StatelessWidget
   //Future checkLoginState(BuildContext context, [bool mounted = true]) async {
   Future checkLoginState(BuildContext context) async {
     final authService = Provider.of<AuthService>(context, listen: false);
+    final socketService = Provider.of<SocketService>(context);
     final autenticado = await authService.isLoggedIn();
     if (!mounted) return;
     //log('$autenticado');
     if (autenticado) {
       //Conectar al socket server
+      socketService.connect();
       //Navegar a la pagina deseada
       Navigator.pushReplacement(
         context,
@@ -43,7 +47,8 @@ class _LoadingPageState extends State<LoadingPage> {
             context,
             animation,
             secondaryAnimation,
-          ) => const UsuariosPage(),
+          ) =>
+              const UsuariosPage(),
           transitionDuration: const Duration(microseconds: 0),
         ),
       );
@@ -56,7 +61,8 @@ class _LoadingPageState extends State<LoadingPage> {
             context,
             animation,
             secondaryAnimation,
-          ) => const LoginPage(),
+          ) =>
+              const LoginPage(),
           transitionDuration: const Duration(microseconds: 0),
         ),
       );
